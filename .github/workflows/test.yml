@@ -21,6 +21,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
       - name: Prepare Android Environment
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
@@ -28,7 +33,9 @@ jobs:
       - name: Build With Gradle
         run: |
           chmod +x gradlew
-          ./gradlew assemblerelease --build-cache --parallel --daemon --warning-mode all -PbuildPython=$(which python3)
+          export PYTHON_BIN=$(which python3)
+          echo "Using Python: $PYTHON_BIN ($($PYTHON_BIN --version))"
+          ./gradlew assemblerelease --build-cache --parallel --daemon --warning-mode all -PbuildPython=$PYTHON_BIN
       - name: Prepare App
         run: |
           mkdir -p ${{ github.workspace }}/apk/
